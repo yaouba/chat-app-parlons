@@ -128,3 +128,12 @@ export const updateProfile = async (req, res) => {
     }
 
 }
+
+export const checkAuth = async (req, res) => {
+    try {
+        res.status(200).json({ success: true, message: 'User is authorized', data: req.user })
+    } catch (error) {
+        console.log('Error in checkAuth controller: ', error.message)
+        return res.status(500).json({ success: false, message: 'Internal Error'})
+    }
+}

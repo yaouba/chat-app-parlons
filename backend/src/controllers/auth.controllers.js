@@ -2,6 +2,7 @@
 import bcrypt from 'bcryptjs'
 import { generateToken } from '../lib/utils.js';
 import User from '../models/user.model.js';
+import cloudinary from '../lib/cloudinary.js';
 
 // Login
 export const login = async (req, res) => {
@@ -13,7 +14,8 @@ export const login = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Invalid Credentials'});
         }
 
-        const isValidPassword = bcrypt.compare(password, user.password);
+        const isValidPassword = await bcrypt.compare(password, user.password);
+
         if (!isValidPassword) {
             return res.status(400).json({ success: false, message: 'Invalid Credentials'});
         }
@@ -95,3 +97,34 @@ export const logout = (req, res) => {
     }
 }
 
+export const updateProfile = async (req, res) => {
+    const { profilePic } = req.body;
+    const userId = req.user._id;
+
+    if (! profilePic) {
+        return res.status(400).json({
+            success: false,
+            message: 'Profile pic is required'
+        })
+    }
+
+    try {
+        const uploadRes = await cloudinary.uploader(profilePic);
+        const updatedUser = await User.findByIdAndUpdate(userId, { profilePic: uploadRes.secure_url }, {new: true});
+    
+        return res.status(200).json({
+            success: true,
+            message: 'Profile pic updated successfully',
+            data: {
+                id: updatedUser._id,
+                fullName: updatedUser.fullName,
+                email: updatedUser.email,
+                profilePic: updatedUser.profilePic
+            }
+        })
+    } catch (err) {
+        console.log('An error occur in updateProfile controller: ', err);
+        return res.status(500).json({ success, message: 'Internal Error'})
+    }
+
+}

@@ -1,11 +1,34 @@
 /** Auth Controllers */
 import bcrypt from 'bcryptjs'
-import User from '../models/user.model.js'
 import { generateToken } from '../lib/utils.js';
+import User from '../models/user.model.js';
 
 // Login
-export const login = (req, res) => {
+export const login = async (req, res) => {
+    const { email, password } = req.body;
 
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ success: false, message: 'Invalid Credentials'});
+        }
+
+        const isValidPassword = bcrypt.compare(password, user.password);
+        if (!isValidPassword) {
+            return res.status(400).json({ success: false, message: 'Invalid Credentials'});
+        }
+
+        await generateToken(user.id, res);
+        return res.status(200).json({
+            success: true,
+            message: 'User logged in successfully',
+            data: { id: user._id, fullName: user.fullName, email: user.email, profilePic: user.profilePic}
+        })
+        
+    } catch (err) {
+        console.log('An error occur when long: ', err.message)
+        return res.status(500).json({ success: false, message: 'Internal Error'})
+    }
 }
 
 // Register
@@ -61,6 +84,14 @@ export const register = async(req, res) => {
 
 // Logout
 export const logout = (req, res) => {
-
+    try {
+        res.cookie("jwt", "", {
+            maxAge: 0
+        });
+        res.status(200).json({ success: true, message: 'Logged out successfully' })
+    } catch (err) {
+        console.log('An error occur when logging out: ', err.message)
+        return res.status(500).json({ success: false, message: 'Internal error'})
+    }
 }
 

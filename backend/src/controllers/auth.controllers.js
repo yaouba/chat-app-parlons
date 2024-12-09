@@ -46,7 +46,12 @@ export const register = async(req, res) => {
         return res.status(201).json({
             success: true,
             message: 'User registred successfully',
-            data: newUser
+            data: {
+                id: newUser._id,
+                fullName: newUser.fullName,
+                email: newUser.email,
+                profilePic: newUser.profilePic
+            }
         })
     } catch (err) {
         console.log('Error in signup controller', err.message)

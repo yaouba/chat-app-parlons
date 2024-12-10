@@ -55,5 +55,18 @@ export const useAuthStore = create((set) => ({
             set({ isLoggingIn: false })
         }
     },
+
+    updateProfile: async (data) => {
+        set({ isUpdatingProfile: true })
+        try {
+            const res = await apiCall.put('/auth/update-profile', data)
+            set({ user: res.data.data})
+            toast.success('Profile picture update successfully')
+        } catch (err) {
+            toast.error(err.response.data.message)
+        } finally {
+            set({ isUpdatingProfile: false })
+        }
+    }
     
 }))

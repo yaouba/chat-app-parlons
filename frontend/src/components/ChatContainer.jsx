@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { useChatStore } from '../store/useChatStore'
 import ChatHeader from './ChatHeader'
 import MessageSkeleton from './skeletons/MessageSkeleton'
@@ -13,6 +13,8 @@ const ChatContainer = () => {
         subscribeToMessages, unsubscribeFromMessages} = useChatStore()
     const { user } = useAuthStore()
 
+    const messageEndRef = useRef(null);
+
     useEffect(() => {
         getMessages(selectedUser?._id)
 
@@ -22,6 +24,12 @@ const ChatContainer = () => {
             unsubscribeFromMessages();
         }
     }, [selectedUser, getMessages, subscribeToMessages, unsubscribeFromMessages])
+
+    useEffect(() => {
+        if (messageEndRef.current) {
+            messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [messages])
 
     if (isMessagesLoading) {
         return (
@@ -41,14 +49,14 @@ const ChatContainer = () => {
                 {messages.map((message) => (
                 <div
                     key={message._id}
-                    className={`chat ${message.senderId === user._id ? "chat-end" : "chat-start"}`}
-                    // ref={messageEndRef}
+                    className={`chat ${message.senderId === user.id ? "chat-end" : "chat-start"}`}
+                    ref={messageEndRef}
                 >
                     <div className=" chat-image avatar">
                     <div className="size-10 rounded-full border">
                         <img
                         src={
-                            message.senderId === user._id
+                            message.senderId === user.id
                             ? user.profilePic || "/avatar.png"
                             : selectedUser.profilePic || "/avatar.png"
                         }

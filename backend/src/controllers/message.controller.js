@@ -1,5 +1,6 @@
 import User from "../models/user.model.js";
 import Message from "../models/message.model.js";
+import cloudinary from '../lib/cloudinary.js';
 
 export const getUsersForSideBar = async (req, res) => {
     try {
@@ -14,13 +15,15 @@ export const getUsersForSideBar = async (req, res) => {
 
 export const getMessages = async (req, res) => {
     try {
-        const { id: userTochatId } = req.params;
-        const userId = req.user._id;
+        const { id: userToChatId } = req.params;
+        const myId = req.user._id;
 
-        const messages = Message.find({ $or: [
-            { senderId: userId }, 
-            { receiverId: userId }
-        ] }).sort({ createdAt: -1 });
+        const messages = await Message.find({
+            $or: [
+              { senderId: myId, receiverId: userToChatId },
+              { senderId: userToChatId, receiverId: myId },
+            ],
+          });
         
         return res.status(200).json({ success: true, message: 'Messages fetched successfully', data: messages })
     } catch (err) {

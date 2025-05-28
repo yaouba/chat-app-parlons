@@ -3,7 +3,7 @@
 
 **Parlons** is a real-time chat application built with the MERN stack (MongoDB, Express.js, React, Node.js). It offers a modern messaging experience with features like user authentication, chat rooms, and media sharing.
 
-![Chat App Screenshot](./screenshots/chat-interface.png)
+![Chat App Screenshot](./screenshots/settings.png)
 
 ## 🚀 Features
 
@@ -27,6 +27,7 @@
 ![Login Page](./screenshots/login.png)
 ![Chat Room](./screenshots/chat-room.png)
 ![User Profile](./screenshots/user-profile.png)
+
 
 ## ⚙️ Installation
 
